@@ -1,0 +1,9 @@
+
+.chart-container {
+  position: relative;
+  height:40vh;
+}
+
+canvas {
+  background-color: white;
+}
