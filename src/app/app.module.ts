@@ -5,12 +5,14 @@ import { AppComponent } from "./app.component"
 import { ProgressDashboardComponent } from "./progress-dashboard/progress-dashboard.component"
 import { HttpClientModule } from "@angular/common/http"
 import { AppRoutingModule } from "./app-routing/app-routing.module"
-import { FormsModule } from "@angular/forms"
+import { FormsModule } from "@angular/forms";
+import { NavbarComponent } from './navbar/navbar.component'
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProgressDashboardComponent
+    ProgressDashboardComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
