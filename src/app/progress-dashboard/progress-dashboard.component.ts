@@ -19,12 +19,14 @@ export class ProgressDashboardComponent implements OnInit, AfterViewInit {
 
   private allData$: Promise<{ levels: Level[], assignments: Assignment[] }>
   private chart: Chart
+  loading = false
 
   constructor(private wanikani: WanikaniService) {
   }
 
   ngOnInit(): void {
     // Request needed data to the backend
+    this.loading = true
     this.allData$ = Promise.all([ this.getLevels(), this.getAssignments() ])
       .then(([ levels, assignments ]) => ({ levels, assignments }))
   }
@@ -46,6 +48,7 @@ export class ProgressDashboardComponent implements OnInit, AfterViewInit {
         this.chart = this.createChart(levelDataset, totalsDataset, radicalsDataset, kanjisDataset, vocabularyDataset)
       })
       .catch(error => {
+        this.loading = false
         console.log(error)
       })
   }
@@ -180,6 +183,12 @@ export class ProgressDashboardComponent implements OnInit, AfterViewInit {
       options: {
         maintainAspectRatio: false,
         responsive: true,
+        animation: {
+          onComplete: (animation) => {
+            console.log("done")
+            this.chartRenderingComplete()
+          }
+        },
         scales: {
           xAxes: [
             {
@@ -241,5 +250,9 @@ export class ProgressDashboardComponent implements OnInit, AfterViewInit {
       }
     }
     return new Chart(ctx, config)
+  }
+
+  private chartRenderingComplete(): void {
+    this.loading = false
   }
 }

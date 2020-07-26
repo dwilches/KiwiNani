@@ -1,9 +1,17 @@
 
 .chart-container {
+  margin-top: 100px;
   position: relative;
   height:40vh;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
-canvas {
-  background-color: white;
+.spinner-grow {
+  width: 3rem;
+  height: 3rem;
 }
