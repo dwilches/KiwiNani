@@ -1,4 +1,6 @@
-# WaniKaniProgressDashboard
+# KiwiNani (WaniKani Progress Dashboard)
 
-Shows graphs to monitor my Japanese learning progress on the [WaniKani website](https://www.wanikani.com).
+Integrates with [WaniKani](https://www.wanikani.com) to monitor your Japanese learning progress.
  
+ 
+![CI](https://github.com/dwilches/wanikani-dashboard/workflows/CI/badge.svg)
