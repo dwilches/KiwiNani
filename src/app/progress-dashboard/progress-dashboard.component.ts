@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit } from "@angular/core"
-import { WanikaniService } from "../wanikani.service"
+import { WanikaniService } from "../wanikani.service/wanikani.service"
 import { Chart } from "chart.js"
 import * as moment from "moment"
 import { Moment } from "moment"

@@ -2,9 +2,10 @@ import { BrowserModule } from "@angular/platform-browser"
 import { NgModule } from "@angular/core"
 
 import { AppComponent } from "./app.component"
-import { WANIKANI_TOKEN } from "./wanikani.service"
 import { ProgressDashboardComponent } from "./progress-dashboard/progress-dashboard.component"
 import { HttpClientModule } from "@angular/common/http"
+import { AppRoutingModule } from "./app-routing/app-routing.module"
+import { FormsModule } from "@angular/forms"
 
 @NgModule({
   declarations: [
@@ -13,11 +14,11 @@ import { HttpClientModule } from "@angular/common/http"
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
+    AppRoutingModule
   ],
-  providers: [
-    { provide: WANIKANI_TOKEN, useValue: "TOKEN_HERE" }
-  ],
+  providers: [],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

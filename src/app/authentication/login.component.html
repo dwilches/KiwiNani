@@ -1,0 +1,50 @@
+<div class="container main-container">
+  <div class="form-container">
+    <div class="form-group row">
+      <form (ngSubmit)="saveToken()"
+            autocomplete="off">
+        <label for="token"
+               class="col-form-label col-12">
+          <h1>WaniKani Token</h1>
+        </label>
+
+        <input [(ngModel)]="token"
+               [readOnly]="savingToken || validToken"
+               (ngModelChange)="onTokenChanged()"
+               id="token"
+               name="token"
+               type="text"
+               class="form-control col-12-auto"
+               placeholder="00000000-0000-0000-0000-000000000000">
+
+        <small id="emailHelp"
+               class="form-text text-muted col-12">
+          Input here a <a href="https://www.wanikani.com/settings/personal_access_tokens">token generated in
+          Wanikani</a> (don't give the token any write access)<br/>
+          This token is stored in your browser, it won't be sent to our application.
+        </small>
+
+        <button *ngIf="!savingToken"
+                type="submit" class="btn btn-primary"
+                [disabled]="!token?.trim() || validToken">
+          Save Token
+        </button>
+        <button *ngIf="savingToken"
+                type="button" class="btn btn-primary" disabled>
+          <span class="spinner-border spinner-border-sm" role="status"></span>
+          Saving Token...
+        </button>
+      </form>
+    </div>
+    <div *ngIf="invalidToken"
+         class="alert alert-danger" role="alert">
+      <b>Invalid token provided.</b><br/>
+      Please copy & paste directly from WaniKani to avoid typos.
+    </div>
+    <div *ngIf="validToken"
+         class="alert alert-success" role="alert">
+      <b>Welcome {{ user | json}} !!</b><br/>
+      You will be redirected to our app in a second ...
+    </div>
+  </div>
+</div>
