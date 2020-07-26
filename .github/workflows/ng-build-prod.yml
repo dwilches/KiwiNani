@@ -1,0 +1,32 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Add build version to the metadata
+        run: |
+          now=$(date)
+          echo Build version: $now
+          sed -i "s/GHA_BUILD_VERSION/$now/" src/index.html
+      - name: Build the website to /docs
+        run: |
+          npm install
+          ./node_modules/.bin/ng build --prod --outputPath docs
+          echo kiwinani.dwilches.com > docs/CNAME
+      - name: Add generated site to main repo
+        run: |
+          git add -A ./docs
+          git config --local user.email "gha.kiwinani@dwilches.com"
+          git config --local user.name "GitHub Actions"
+          git commit -m "Automatically built by GitHub actions"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
