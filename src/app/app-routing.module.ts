@@ -5,6 +5,7 @@ import { AuthenticationGuard } from "./authentication/authentication.guard"
 import { LoginComponent } from "./login/login.component"
 import { FormsModule } from "@angular/forms"
 import { CommonModule } from "@angular/common"
+import { PracticeGameComponent } from "./practice-game/practice-game.component"
 
 
 const routes: Routes = [
@@ -17,6 +18,11 @@ const routes: Routes = [
   {
     path: "login",
     component: LoginComponent,
+    pathMatch: "full"
+  },
+  {
+    path: "game",
+    component: PracticeGameComponent,
     pathMatch: "full"
   },
   {

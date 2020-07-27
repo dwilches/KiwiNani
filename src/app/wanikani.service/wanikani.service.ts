@@ -39,6 +39,7 @@ export class WanikaniService {
 
   public removeToken(): void {
     localStorage.removeItem("WANIKANI_TOKEN")
+    this.authToken = null
     this.userSubject.next(null)
   }
 
