@@ -30,6 +30,10 @@ export class WanikaniService {
       })
   }
 
+  public removeToken(): void {
+    localStorage.removeItem("WANIKANI_TOKEN")
+  }
+
   public getUser(): Promise<UserResponse> {
     return this.get<UserResponse>(`user`)
       .toPromise()
