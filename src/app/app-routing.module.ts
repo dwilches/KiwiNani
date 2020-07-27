@@ -1,8 +1,8 @@
 import { NgModule } from "@angular/core"
 import { RouterModule, Routes } from "@angular/router"
-import { ProgressDashboardComponent } from "../progress-dashboard/progress-dashboard.component"
-import { AuthenticationGuard } from "../authentication/authentication.guard"
-import { LoginComponent } from "../authentication/login.component"
+import { ProgressChartComponent } from "./progress-chart/progress-chart.component"
+import { AuthenticationGuard } from "./authentication/authentication.guard"
+import { LoginComponent } from "./login/login.component"
 import { FormsModule } from "@angular/forms"
 import { CommonModule } from "@angular/common"
 
@@ -11,7 +11,7 @@ const routes: Routes = [
   {
     path: "main",
     canActivate: [ AuthenticationGuard ],
-    component: ProgressDashboardComponent,
+    component: ProgressChartComponent,
     pathMatch: "full"
   },
   {

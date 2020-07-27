@@ -12,10 +12,10 @@ type AssignmentAccumulator = { total: number, radicals: number, kanjis: number, 
 
 @Component({
   selector: "app-progress-dashboard",
-  templateUrl: "./progress-dashboard.component.html",
-  styleUrls: [ "./progress-dashboard.component.css" ]
+  templateUrl: "./progress-chart.component.html",
+  styleUrls: [ "./progress-chart.component.css" ]
 })
-export class ProgressDashboardComponent implements OnInit, AfterViewInit {
+export class ProgressChartComponent implements OnInit, AfterViewInit {
 
   private allData$: Promise<{ levels: Level[], assignments: Assignment[] }>
   private chart: Chart
@@ -185,7 +185,6 @@ export class ProgressDashboardComponent implements OnInit, AfterViewInit {
         responsive: true,
         animation: {
           onComplete: (animation) => {
-            console.log("done")
             this.chartRenderingComplete()
           }
         },
