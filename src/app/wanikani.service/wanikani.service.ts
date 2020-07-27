@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
 import { HttpClient, HttpHeaders } from "@angular/common/http"
-import { Observable } from "rxjs"
+import { Observable, ReplaySubject } from "rxjs"
 import { map } from "rxjs/operators"
 
 @Injectable({
@@ -10,9 +10,15 @@ export class WanikaniService {
 
   private readonly wanikaniServer = "https://api.wanikani.com"
   private authToken: string
+  private userSubject = new ReplaySubject<UserResponse>(1)
 
   constructor(private http: HttpClient) {
     this.authToken = localStorage.getItem("WANIKANI_TOKEN")
+
+    if (this.isAuthed()) {
+      this.getUser(this.authToken)
+        .then(user => this.userSubject.next(user))
+    }
   }
 
   public isAuthed(): boolean {
@@ -26,17 +32,18 @@ export class WanikaniService {
       .then(user => {
         localStorage.setItem("WANIKANI_TOKEN", authToken)
         this.authToken = authToken
+        this.userSubject.next(user)
         return user
       })
   }
 
   public removeToken(): void {
     localStorage.removeItem("WANIKANI_TOKEN")
+    this.userSubject.next(null)
   }
 
-  public getUser(): Promise<UserResponse> {
-    return this.get<UserResponse>(`user`)
-      .toPromise()
+  public getUser$(): Observable<UserResponse> {
+    return this.userSubject.asObservable()
   }
 
   public getLevelProgressions(): Promise<LevelProgression[]> {
@@ -49,6 +56,11 @@ export class WanikaniService {
     return this.get<AssignmentResponse>(`assignments`)
       .toPromise()
       .then(assignments => assignments.map(a => a.data))
+  }
+
+  private getUser(overrideAuthToken: string): Promise<UserResponse> {
+    return this.get<UserResponse>(`user`, overrideAuthToken)
+      .toPromise()
   }
 
   private get<T>(url: string, overrideAuthToken?: string): Observable<T> {

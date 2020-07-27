@@ -28,7 +28,9 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
     // Request needed data to the backend
     this.loading = true
     this.allData$ = Promise.all([ this.getLevels(), this.getAssignments() ])
-      .then(([ levels, assignments ]) => ({ levels, assignments }))
+      .then(([ levels, assignments ]) => {
+        return { levels, assignments }
+      })
   }
 
   ngAfterViewInit(): void {
@@ -244,7 +246,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
         },
         title: {
           display: true,
-          text: "My WaniKani Progress Dashboard"
+          text: `WaniKani Progress`
         },
       }
     }

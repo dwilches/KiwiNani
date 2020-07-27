@@ -1,0 +1,24 @@
+
+.app-navbar {
+  border-bottom: 1px solid #d5d5d5;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+}
+
+.app-nav-link {
+
+  &.active {
+    color: #0099e6;
+  }
+
+  &:hover:not([disabled]) {
+    border-color: #00aaff;
+    color: #0099e6;
+  }
+
+  &[disabled] {
+    color: #888888;
+  }
+
+  border: 2px solid transparent;
+  color: #333333;
+}

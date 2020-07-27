@@ -25,7 +25,7 @@
         </small>
 
         <button *ngIf="!savingToken"
-                type="submit" class="btn btn-primary"
+                type="submit" class="btn btn-primary app-primary-button"
                 [disabled]="!token?.trim() || validToken">
           Save Token
         </button>
@@ -43,7 +43,7 @@
     </div>
     <div *ngIf="validToken"
          class="alert alert-success" role="alert">
-      <b>Welcome {{ user | json}} !!</b><br/>
+      <b>Welcome {{ user }} !!</b><br/>
       You will be redirected to our app in a second ...
     </div>
   </div>

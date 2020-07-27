@@ -10,10 +10,19 @@
         KiwiNani
       </a>
       <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item">
+          <button class="btn btn-sm app-nav-link" routerLink="main" routerLinkActive="active">Progress</button>
+        </li>
       </ul>
-      <button class="btn btn-outline-success my-2 my-sm-0" type="button"
-              (click)="logout()">Logout
-      </button>
+      <div *ngIf="username$ | async" class="dropdown">
+        <button class="btn btn-primary dropdown-toggle app-primary-button" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-user-circle"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" (click)="logout()">Logout {{ username$ | async }}</a>
+        </div>
+      </div>
     </div>
   </div>
 </nav>
