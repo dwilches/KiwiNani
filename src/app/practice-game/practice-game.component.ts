@@ -1,6 +1,9 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from "@angular/core"
 
 import * as THREE from "three"
+import * as _ from "lodash"
+import { Balloon } from "./game-engine/balloon"
+import { GameEngine } from "./game-engine/game-engine"
 
 @Component({
   selector: "app-practice-game",
@@ -9,15 +12,10 @@ import * as THREE from "three"
 })
 export class PracticeGameComponent implements AfterViewInit, OnDestroy {
 
-  scene: THREE.Scene
-  camera: THREE.Camera
-  renderer: THREE.Renderer
-  cube: THREE.Mesh
-
-  private destroyed = false
-
   @ViewChild("gameCanvas") gameCanvas: ElementRef
   @ViewChild("gameContainer") gameContainer: ElementRef
+
+  gameEngine: GameEngine
 
   constructor() {
   }
@@ -28,36 +26,25 @@ export class PracticeGameComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroyed = true
+    this.gameEngine.destroy()
   }
 
   private initScene(): void {
     const width = this.gameContainer.nativeElement.offsetWidth - 20
     const height = this.gameContainer.nativeElement.offsetHeight - 20
+    const canvas = this.gameCanvas.nativeElement
 
-    this.scene = new THREE.Scene()
-    this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.gameCanvas.nativeElement })
-    this.renderer.setSize(width, height)
-
-    const geometry = new THREE.BoxGeometry()
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-    this.cube = new THREE.Mesh(geometry, material)
-    this.scene.add(this.cube)
-
-    this.camera.position.z = 5
+    this.gameEngine = new GameEngine(width, height, canvas)
+    this.gameEngine.addObject(new Balloon())
   }
 
   private animate(): void {
-    // Use `destroyed` as otherwise requestAnimationFrame would execute again even after the component has been destroyed
-    if (this.destroyed) {
+    // Stop the animation once OnDestroy has been invoked
+    if (!this.gameEngine) {
       return
     }
+
     requestAnimationFrame(() => this.animate())
-    this.cube.rotation.x += 0.01
-    this.cube.rotation.y += 0.01
-    this.renderer.render(this.scene, this.camera)
-    console.log("ok pol")
+    this.gameEngine.update()
   }
 }
