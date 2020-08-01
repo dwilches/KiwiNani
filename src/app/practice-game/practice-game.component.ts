@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from "@angular/core"
 
-import * as THREE from "three"
-import * as _ from "lodash"
 import { Balloon } from "./game-engine/balloon"
 import { GameEngine } from "./game-engine/game-engine"
 
@@ -17,34 +15,29 @@ export class PracticeGameComponent implements AfterViewInit, OnDestroy {
 
   gameEngine: GameEngine
 
+  private nextBalloonCreationTime = 0
+  private balloonCreationSpeed = 1 // per second
+
   constructor() {
   }
 
   ngAfterViewInit(): void {
-    this.initScene()
-    this.animate()
+    const width = this.gameContainer.nativeElement.offsetWidth - 20
+    const height = this.gameContainer.nativeElement.offsetHeight - 20
+    const canvas = this.gameCanvas.nativeElement
+
+    this.gameEngine = new GameEngine(width, height, canvas, (...args) => this.onUpdate(...args))
+    this.gameEngine.start()
   }
 
   ngOnDestroy(): void {
     this.gameEngine.destroy()
   }
 
-  private initScene(): void {
-    const width = this.gameContainer.nativeElement.offsetWidth - 20
-    const height = this.gameContainer.nativeElement.offsetHeight - 20
-    const canvas = this.gameCanvas.nativeElement
-
-    this.gameEngine = new GameEngine(width, height, canvas)
-    this.gameEngine.addObject(new Balloon())
-  }
-
-  private animate(): void {
-    // Stop the animation once OnDestroy has been invoked
-    if (!this.gameEngine) {
-      return
+  private onUpdate(width: number, height: number, time: number, deltaTime: number): void {
+    if (this.nextBalloonCreationTime < time) {
+      this.gameEngine.addObject(new Balloon())
+      this.nextBalloonCreationTime = time + 1 / this.balloonCreationSpeed
     }
-
-    requestAnimationFrame(() => this.animate())
-    this.gameEngine.update()
   }
 }

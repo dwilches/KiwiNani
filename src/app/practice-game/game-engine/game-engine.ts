@@ -1,6 +1,8 @@
 import { GameObject } from "./game-object"
 import * as THREE from "three"
 
+type OnUpdateCallback = (width: number, height: number, time: number, deltaTime: number) => void
+
 /**
  * Super light Unity-like Game Engine
  *
@@ -18,20 +20,30 @@ export class GameEngine {
   // The values of the inner
   private sharedResources: Map<string, Map<string, any>> = new Map()
 
-  // List of game objects currently added to the scene. The GameEngine invokes the "update" method of these objects for rendering each
+  // Game objects currently added to the scene. The GameEngine invokes the "update" method of these objects for rendering each
   // frame.
-  private readonly gameObjects: GameObject[] = []
+  private readonly gameObjects: Map<GameObject, THREE.Object3D> = new Map()
 
   // The time at which the GameEngine started running. The "time" variable starts counting from 0, where 0 means "startTime".
   private readonly startTime: number
   // Time is used to calculate the deltaTime, which is used by the GameObjects to make calculations independent of frame rate.
   // Analogous to Unity's. Moving something at speed "10 * deltaTime" will move it at 10 units per second.
   private time: number
-  // Size of the canvas where the scene is rendered
-  private readonly width: number
-  private readonly height: number
 
-  public constructor(width: number, height: number, nativeElement: HTMLCanvasElement) {
+  // Stop requesting animation frames from the browser once Destroy has been invoked.
+  private destroyed = false
+
+  /**
+   *
+   * @param width Width of the canvas where the scene is rendered.
+   * @param height Height of the canvas where the scene is rendered.
+   * @param nativeElement DOM native canvas element that will be used by the game engine to draw the scene.
+   * @param mainOnUpdateCallback Invoked each frame before the update callbacks of the game objects.
+   */
+  public constructor(private width: number,
+                     private height: number,
+                     nativeElement: HTMLCanvasElement,
+                     private mainOnUpdateCallback: OnUpdateCallback) {
     this.width = width
     this.height = height
 
@@ -48,6 +60,10 @@ export class GameEngine {
     this.time = 0
   }
 
+  public start(): void {
+    this.animate3js()
+  }
+
   // Should be invoked on each frame of Three.js to update the scene.
   // This method also invokes the "update" methods of any GameObject that is in the scene.
   public update(): void {
@@ -55,28 +71,39 @@ export class GameEngine {
     const deltaTime = newTime - this.time
     this.time = newTime
 
-    this.gameObjects.forEach(go => go.beforeFrame(newTime, deltaTime))
-    this.gameObjects.forEach(go => go.update())
+    this.mainOnUpdateCallback(this.width, this.height, this.time, deltaTime)
+    this.gameObjects.forEach((o3js, go) => go.beforeFrame(newTime, deltaTime))
+    this.gameObjects.forEach((o3js, go) => go.update())
 
     this.renderer.render(this.scene, this.camera)
   }
 
   // Should be invoked by Three.js when the canvas component is about to be destroyed.
   public destroy(): void {
-    this.gameObjects.forEach(go => go.destroy())
+    this.gameObjects.forEach((o3js, go) => go.destroy())
     this.sharedResources.forEach(resGroup => {
       resGroup.forEach(res => res.dispose())
     })
     this.scene.dispose()
     this.renderer.dispose()
+    this.destroyed = true
   }
 
   public addObject(gameObject: GameObject): void {
     gameObject.initGameObject(this.width, this.height, this)
     const threeJsObject = gameObject.start()
 
-    this.gameObjects.push(gameObject)
+    this.gameObjects.set(gameObject, threeJsObject)
     this.scene.add(threeJsObject)
+  }
+
+  removeObject(gameObject: GameObject): void {
+    if (this.gameObjects.has(gameObject)) {
+      const o3js = this.gameObjects.get(gameObject)
+      this.gameObjects.delete(gameObject)
+      this.scene.remove(o3js)
+      gameObject.destroy()
+    }
   }
 
   // GameObjects can use this method to request shared resources. These resources will be alive until the GameEngine instance is disposed.
@@ -90,5 +117,15 @@ export class GameEngine {
       this.sharedResources[requester.constructor.name][name] = factory()
     }
     return this.sharedResources[requester.constructor.name][name] as T
+  }
+
+  private animate3js(): void {
+    // Stop the animation once OnDestroy has been invoked
+    if (this.destroyed) {
+      return
+    }
+
+    requestAnimationFrame(() => this.animate3js())
+    this.update()
   }
 }
