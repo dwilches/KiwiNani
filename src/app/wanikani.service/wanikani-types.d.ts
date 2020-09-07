@@ -3,7 +3,13 @@ interface WaniKaniResponse {
   url: string
   data_updated_at: date
   data: unknown
-  pages?: object
+  pages?: PagesObject
+}
+
+interface PagesObject {
+  per_page: number
+  next_url: string
+  previous_url: string
 }
 
 interface UserResponse {

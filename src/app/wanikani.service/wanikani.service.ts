@@ -1,7 +1,7 @@
-import { Injectable } from "@angular/core"
-import { HttpClient, HttpHeaders } from "@angular/common/http"
-import { Observable, ReplaySubject } from "rxjs"
-import { map } from "rxjs/operators"
+import {Injectable} from "@angular/core"
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http"
+import {Observable, ReplaySubject} from "rxjs"
+import {map} from "rxjs/operators"
 
 @Injectable({
   providedIn: "root"
@@ -53,10 +53,16 @@ export class WanikaniService {
       .then(levels => levels.map(level => level.data))
   }
 
-  public getAllAssignments(): Promise<Assignment[]> {
-    return this.get<AssignmentResponse>(`assignments`)
-      .toPromise()
-      .then(assignments => assignments.map(a => a.data))
+  // Invokes the "assignments" endpoint once and again until all data has been retrieved.
+  public async getAllAssignments(): Promise<Assignment[]> {
+    let nextUrl = `${this.wanikaniServer}/v2/assignments`
+    let allData = []
+    while (nextUrl) {
+      const response = await this.baseGet(nextUrl).toPromise()
+      allData = [...allData, ...(response.data as AssignmentMetadata[])]
+      nextUrl = response.pages.next_url
+    }
+    return allData.map(a => a.data)
   }
 
   private getUser(overrideAuthToken: string): Promise<UserResponse> {
@@ -65,13 +71,17 @@ export class WanikaniService {
   }
 
   private get<T>(url: string, overrideAuthToken?: string): Observable<T> {
+    return this.baseGet(`${this.wanikaniServer}/v2/${url}`, overrideAuthToken)
+      .pipe(map(response => response.data as T))
+  }
+
+  private baseGet(url: string, overrideAuthToken?: string, params?: Record<string, string>): Observable<WaniKaniResponse> {
     const headers = new HttpHeaders({
       "Content-Type": "application/json",
       Authorization: "Bearer " + (overrideAuthToken || this.authToken)
     })
 
-    return this.http.get<WaniKaniResponse>(`${ this.wanikaniServer }/v2/${ url }`, { headers })
-      .pipe(map(response => response.data as T))
+    return this.http.get<WaniKaniResponse>(url, {headers, params})
   }
 
 }
