@@ -4,11 +4,12 @@ import { Chart } from "chart.js"
 import * as moment from "moment"
 import { Moment } from "moment"
 import * as _ from "lodash"
-import { last } from "./helpers"
 
 type Level = { date: Moment, level: number }
 type Assignment = { date: Moment, total: number, kanjis: number, radicals: number, vocabulary: number }
 type AssignmentAccumulator = { total: number, radicals: number, kanjis: number, vocabulary: number }
+
+const MIN_PASSED_AT = moment().subtract(2, "months")
 
 @Component({
   selector: "app-progress-dashboard",
@@ -29,6 +30,8 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
     this.loading = true
     this.allData$ = Promise.all([ this.getLevels(), this.getAssignments() ])
       .then(([ levels, assignments ]) => {
+        assignments = assignments.filter(o => o.date > MIN_PASSED_AT)
+        levels = levels.filter(o => o.date > MIN_PASSED_AT)
         return { levels, assignments }
       })
   }
@@ -42,12 +45,11 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
         // This dataset has in "x" the date in which an assignment was passed, and in "y" the accumulated number of assignments passed
         // up to that day.
         const assignments = _.uniqBy(allData.assignments, ass => moment(ass.date).startOf("hour").format())
-        const totalsDataset = assignments.map(({ total, date }) => ({ x: date, y: total }))
         const kanjisDataset = assignments.map(({ kanjis, date }) => ({ x: date, y: kanjis }))
         const vocabularyDataset = assignments.map(({ vocabulary, date }) => ({ x: date, y: vocabulary }))
         const radicalsDataset = assignments.map(({ radicals, date }) => ({ x: date, y: radicals }))
 
-        this.chart = this.createChart(levelDataset, totalsDataset, radicalsDataset, kanjisDataset, vocabularyDataset)
+        this.chart = this.createChart(levelDataset, radicalsDataset, kanjisDataset, vocabularyDataset)
       })
       .catch(error => {
         this.loading = false
@@ -109,28 +111,11 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
   }
 
   private createChart(levelDataset: any,
-                      totalsDataset: any,
                       radicalsDataset: any,
                       kanjisDataset: any,
                       vocabularyDataset: any): Chart {
     // Calculate data bounds for the Levels dataset
-    const levelEpochsMs = levelDataset.map(({ x }) => +x)
-    const levelMinDate = Math.min(...levelEpochsMs)
-    const levelMaxDate = Math.max(...levelEpochsMs)
     const levelMaxY = Math.max(...levelDataset.map(({ y }) => y))
-
-    // Calculate data bounds for the Assignments dataset
-    const assEpochsMs = totalsDataset.map(({ x }) => +x)
-    const assMinDate = Math.min(...assEpochsMs)
-    const assMaxDate = Math.max(...assEpochsMs)
-
-    // Add a first and last point in each dataset to make the graph look better
-    const minX = moment(Math.min(levelMinDate, assMinDate)).startOf("day")
-    const maxX = moment(Math.max(levelMaxDate, assMaxDate)).startOf("day").add(1, "days")
-    levelDataset = [ { x: moment(minX), y: 1 }, ...levelDataset, { x: moment(maxX), y: levelMaxY } ]
-    kanjisDataset = [ { x: moment(minX), y: 0 }, ...kanjisDataset, { x: moment(maxX), y: last(kanjisDataset).y } ]
-    vocabularyDataset = [ { x: moment(minX), y: 0 }, ...vocabularyDataset, { x: moment(maxX), y: last(vocabularyDataset).y } ]
-    radicalsDataset = [ { x: moment(minX), y: 0 }, ...radicalsDataset, { x: moment(maxX), y: last(radicalsDataset).y } ]
 
     const ctx = (document.getElementById("dashboardChart") as any).getContext("2d")
     const config = {
@@ -186,7 +171,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
         maintainAspectRatio: false,
         responsive: true,
         animation: {
-          onComplete: (animation) => {
+          onComplete: () => {
             this.chartRenderingComplete()
           }
         },

@@ -2,10 +2,6 @@
 type DataSetPoint = { x: number, y: number }
 type DataSet = Array<DataSetPoint>
 
-export function last(dataset: DataSet): DataSetPoint {
-  return dataset[dataset.length - 1]
-}
-
 export function removeDuplicates(originalDataset: DataSet): DataSet {
   const newDataset = originalDataset.reduce((accumDataset: DataSet, curr, index) => {
     if (!accumDataset.length || last(accumDataset).y !== curr.y) {
