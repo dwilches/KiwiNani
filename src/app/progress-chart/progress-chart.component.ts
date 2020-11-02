@@ -4,10 +4,6 @@ import { Chart } from "chart.js"
 import * as moment from "moment"
 import { Moment } from "moment"
 import * as _ from "lodash"
-import * as $ from "jquery"
-import { BehaviorSubject, combineLatest, Observable, Subscription } from "rxjs"
-import { fromPromise } from "rxjs/internal-compatibility"
-import { map } from "rxjs/operators"
 
 type Level = { date: Moment, level: number }
 type Assignment = { date: Moment, total: number, kanjis: number, radicals: number, vocabulary: number }
@@ -67,23 +63,20 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
   public changeTimeSpan(timespan: string): void {
     this.currentTimeSpan = timespan as ChartTimeSpan
 
-    let min, max
+    let min
 
     switch (this.currentTimeSpan) {
       case ChartTimeSpan.LastMonth:
         min = moment().subtract(1, "months").startOf("day")
-        max = moment().endOf("day")
         break
       case ChartTimeSpan.Last3Months:
         min = moment().subtract(3, "months").startOf("day")
-        max = moment().endOf("day")
         break
       case ChartTimeSpan.All:
         min = this.levels[0].date.startOf("day")
-        max = moment().endOf("day")
     }
 
-    this.chart.options.scales.xAxes[0].time = { min, max }
+    this.chart.options.scales.xAxes[0].time = { min }
     this.chart.update()
   }
 
