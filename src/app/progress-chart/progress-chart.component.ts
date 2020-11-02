@@ -1,15 +1,23 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core"
+import { AfterViewInit, Component, OnDestroy, OnInit } from "@angular/core"
 import { WanikaniService } from "../wanikani.service/wanikani.service"
 import { Chart } from "chart.js"
 import * as moment from "moment"
 import { Moment } from "moment"
 import * as _ from "lodash"
+import * as $ from "jquery"
+import { BehaviorSubject, combineLatest, Observable, Subscription } from "rxjs"
+import { fromPromise } from "rxjs/internal-compatibility"
+import { map } from "rxjs/operators"
 
 type Level = { date: Moment, level: number }
 type Assignment = { date: Moment, total: number, kanjis: number, radicals: number, vocabulary: number }
 type AssignmentAccumulator = { total: number, radicals: number, kanjis: number, vocabulary: number }
 
-const MIN_PASSED_AT = moment().subtract(2, "months")
+enum ChartTimeSpan {
+  All = "ALL",
+  LastMonth = "LAST_MONTH",
+  Last3Months = "LAST_3_MONTHS"
+}
 
 @Component({
   selector: "app-progress-dashboard",
@@ -18,43 +26,65 @@ const MIN_PASSED_AT = moment().subtract(2, "months")
 })
 export class ProgressChartComponent implements OnInit, AfterViewInit {
 
-  private allData$: Promise<{ levels: Level[], assignments: Assignment[] }>
+  private levels: Level[]
   private chart: Chart
+  currentTimeSpan: ChartTimeSpan
   loading = false
 
   constructor(private wanikani: WanikaniService) {
   }
 
   ngOnInit(): void {
-    // Request needed data to the backend
+    // Show "loading" until all backend data has arrived, and the chart has been rendered
     this.loading = true
-    this.allData$ = Promise.all([ this.getLevels(), this.getAssignments() ])
-      .then(([ levels, assignments ]) => {
-        assignments = assignments.filter(o => o.date > MIN_PASSED_AT)
-        levels = levels.filter(o => o.date > MIN_PASSED_AT)
-        return { levels, assignments }
-      })
   }
 
   ngAfterViewInit(): void {
-    this.allData$
-      .then(allData => {
+    Promise.all([ this.getLevels(), this.getAssignments() ])
+      .then(([ alLevels, allAssignments ]) => {
+        this.levels = alLevels
+
         // This dataset has in "x" the date in which each level was reached, and in "y" the level number
-        const levelDataset = allData.levels.map(({ level, date }) => ({ x: date, y: level }))
+        const levelDataset = alLevels.map(({ level, date }) => ({ x: date, y: level }))
 
         // This dataset has in "x" the date in which an assignment was passed, and in "y" the accumulated number of assignments passed
         // up to that day.
-        const assignments = _.uniqBy(allData.assignments, ass => moment(ass.date).startOf("hour").format())
+        const assignments = _.uniqBy(allAssignments, ass => moment(ass.date).startOf("hour").format())
         const kanjisDataset = assignments.map(({ kanjis, date }) => ({ x: date, y: kanjis }))
         const vocabularyDataset = assignments.map(({ vocabulary, date }) => ({ x: date, y: vocabulary }))
         const radicalsDataset = assignments.map(({ radicals, date }) => ({ x: date, y: radicals }))
 
         this.chart = this.createChart(levelDataset, radicalsDataset, kanjisDataset, vocabularyDataset)
+        this.changeTimeSpan(ChartTimeSpan.LastMonth)
+        this.loading = false
       })
       .catch(error => {
         this.loading = false
         console.log(error)
       })
+  }
+
+  public changeTimeSpan(timespan: string): void {
+    this.currentTimeSpan = timespan as ChartTimeSpan
+
+    let min, max
+
+    switch (this.currentTimeSpan) {
+      case ChartTimeSpan.LastMonth:
+        min = moment().subtract(1, "months").startOf("day")
+        max = moment().endOf("day")
+        break
+      case ChartTimeSpan.Last3Months:
+        min = moment().subtract(3, "months").startOf("day")
+        max = moment().endOf("day")
+        break
+      case ChartTimeSpan.All:
+        min = this.levels[0].date.startOf("day")
+        max = moment().endOf("day")
+    }
+
+    this.chart.options.scales.xAxes[0].time = { min, max }
+    this.chart.update()
   }
 
   private getLevels(): Promise<Level[]> {
@@ -127,7 +157,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
             data: levelDataset,
             backgroundColor: "rgba(255, 99, 132, 0.2)",
             borderColor: "rgba(255, 99, 132, 1)",
-            borderWidth: 1,
+            borderWidth: 3,
             fill: false,
             lineTension: 0,
             yAxisID: "left",
@@ -139,7 +169,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
             borderColor: "rgba(0,161,241,0.8)",
             borderWidth: 1,
             fill: "origin",
-            pointRadius: 1,
+            pointRadius: 3,
             steppedLine: "before",
             yAxisID: "right",
           },
@@ -150,7 +180,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
             borderColor: "rgba(241,0,161,0.8)",
             borderWidth: 1,
             fill: "-1",
-            pointRadius: 1,
+            pointRadius: 3,
             steppedLine: "before",
             yAxisID: "right",
           },
@@ -161,7 +191,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
             borderColor: "rgba(161,0,241,0.8)",
             borderWidth: 1,
             fill: "-1",
-            pointRadius: 1,
+            pointRadius: 3,
             steppedLine: "before",
             yAxisID: "right",
           }
@@ -170,11 +200,6 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
       options: {
         maintainAspectRatio: false,
         responsive: true,
-        animation: {
-          onComplete: () => {
-            this.chartRenderingComplete()
-          }
-        },
         scales: {
           xAxes: [
             {
@@ -236,9 +261,5 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
       }
     }
     return new Chart(ctx, config)
-  }
-
-  private chartRenderingComplete(): void {
-    this.loading = false
   }
 }

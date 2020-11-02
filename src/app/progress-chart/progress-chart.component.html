@@ -8,4 +8,30 @@
       </div>
     </div>
   </div>
+  <div class="d-flex justify-content-center timespan-buttons">
+    <button class="btn"
+            [ngClass]="{
+              'btn-secondary': currentTimeSpan != 'LAST_MONTH',
+              'btn-primary app-primary-button': currentTimeSpan == 'LAST_MONTH'
+            }"
+            [disabled]="loading"
+            (click)="changeTimeSpan('LAST_MONTH')">Last month
+    </button>
+    <button class="btn"
+            [ngClass]="{
+              'btn-secondary': currentTimeSpan != 'LAST_3_MONTHS',
+              'btn-primary app-primary-button': currentTimeSpan == 'LAST_3_MONTHS'
+            }"
+            [disabled]="loading"
+            (click)="changeTimeSpan('LAST_3_MONTHS')">Last 3 months
+    </button>
+    <button class="btn"
+            [ngClass]="{
+              'btn-secondary': currentTimeSpan != 'ALL',
+              'btn-primary app-primary-button': currentTimeSpan == 'ALL'
+            }"
+            [disabled]="loading"
+            (click)="changeTimeSpan('ALL')">All
+    </button>
+  </div>
 </div>
