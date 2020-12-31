@@ -112,7 +112,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
               },
               scaleLabel: {
                 display: true,
-                labelString: "Date When Passed"
+                labelString: "Date"
               }
             }
           ],
