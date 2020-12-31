@@ -34,4 +34,30 @@
             (click)="changeTimeSpan('ALL')">All
     </button>
   </div>
+  <div class="d-flex justify-content-center criteria-buttons">
+    <button class="btn"
+            [ngClass]="{
+              'btn-secondary': currentCriteria != 'LEVEL',
+              'btn-primary app-primary-button': currentCriteria == 'LEVEL'
+            }"
+            [disabled]="loading"
+            (click)="changeCriteria('LEVEL')">Level
+    </button>
+    <button class="btn"
+            [ngClass]="{
+              'btn-secondary': currentCriteria != 'PASSED_AT',
+              'btn-primary app-primary-button': currentCriteria == 'PASSED_AT'
+            }"
+            [disabled]="loading"
+            (click)="changeCriteria('PASSED_AT')">Passed At
+    </button>
+    <button class="btn"
+            [ngClass]="{
+              'btn-secondary': currentCriteria != 'BURNED_AT',
+              'btn-primary app-primary-button': currentCriteria == 'BURNED_AT'
+            }"
+            [disabled]="loading"
+            (click)="changeCriteria('BURNED_AT')">Burned At
+    </button>
+  </div>
 </div>
