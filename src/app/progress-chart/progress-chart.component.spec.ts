@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ProgressChartComponent } from './progress-chart.component';
 
@@ -6,7 +6,7 @@ describe('ProgressDashboardComponent', () => {
   let component: ProgressChartComponent;
   let fixture: ComponentFixture<ProgressChartComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ProgressChartComponent ]
     })

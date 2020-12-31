@@ -38,7 +38,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule.forRoot(routes, { useHash: true })
+    RouterModule.forRoot(routes, { useHash: true, relativeLinkResolution: "legacy" })
   ],
   exports: [
     RouterModule
