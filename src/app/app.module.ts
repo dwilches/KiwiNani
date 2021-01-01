@@ -5,16 +5,14 @@ import { AppComponent } from "./app.component"
 import { ProgressChartComponent } from "./progress-chart/progress-chart.component"
 import { HttpClientModule } from "@angular/common/http"
 import { AppRoutingModule } from "./app-routing.module"
-import { FormsModule } from "@angular/forms";
-import { NavbarComponent } from './navbar/navbar.component';
-import { PracticeGameComponent } from './practice-game/practice-game.component'
+import { FormsModule } from "@angular/forms"
+import { NavbarComponent } from "./navbar/navbar.component"
 
 @NgModule({
   declarations: [
     AppComponent,
     ProgressChartComponent,
     NavbarComponent,
-    PracticeGameComponent
   ],
   imports: [
     BrowserModule,
