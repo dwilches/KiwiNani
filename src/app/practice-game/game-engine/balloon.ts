@@ -1,6 +1,6 @@
 import { GameObject } from "./game-object"
 import * as THREE from "three"
-import * as _ from "lodash"
+import random from "lodash/random"
 
 export class Balloon extends GameObject {
   private texture: THREE.Texture
@@ -18,11 +18,11 @@ export class Balloon extends GameObject {
       () => new THREE.SpriteMaterial({ map: this.texture, color: 0xffffff }))
 
     this.sprite = new THREE.Sprite(this.material)
-    this.sprite.position.x = _.random(-this.width / 2 + this.spriteSize, this.width / 2 - this.spriteSize / 2)
+    this.sprite.position.x = random(-this.width / 2 + this.spriteSize, this.width / 2 - this.spriteSize / 2)
     this.sprite.position.y = -this.height / 2
     this.sprite.scale.x = this.spriteSize
     this.sprite.scale.y = this.spriteSize
-    this.balloonSpeed = _.random(20, 100)
+    this.balloonSpeed = random(20, 100)
 
     return this.sprite
   }

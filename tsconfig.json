@@ -19,7 +19,6 @@
     ],
     "paths": {
       "chart.js": ["./node_modules/chart.js/dist/Chart.min.js"],
-      "lodash": ["./node_modules/lodash/lodash.min.js"],
       "moment": ["./node_modules/moment/min/moment.min.js"],
       "three": ["./node_modules/three/build/three.min.js"]
     },

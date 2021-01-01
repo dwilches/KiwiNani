@@ -1,4 +1,4 @@
-import * as _ from "lodash"
+import sortBy from "lodash/sortBy"
 import * as moment from "moment"
 import { Moment } from "moment"
 
@@ -17,10 +17,8 @@ export class CountsChart {
 
   public getMinX(chartType: ChartType): Moment {
     const field = chartType === "PASSED_AT" ? "passed_at" : "burned_at"
-    const sorted: Moment[] = _.chain(this.allAssignments)
-      .sortBy(field)
+    const sorted: Moment[] = sortBy(this.allAssignments, field)
       .map(ass => moment(ass[field]))
-      .value()
     return sorted[0].startOf("day")
   }
 
@@ -91,7 +89,7 @@ export class CountsChart {
     let totalAccum: SingleAccumulator = { total: 0, kanjis: 0, radicals: 0, vocabulary: 0 }
     const accumByDate: Accumulators = {}
 
-    _.sortBy(this.allAssignments, field)
+    sortBy(this.allAssignments, field)
       .filter(ass => ass[field])
       .forEach(ass => {
         const date = moment(ass[field]).startOf("hour").format()

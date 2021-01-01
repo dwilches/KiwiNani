@@ -1,4 +1,4 @@
-import * as _ from "lodash"
+import sortBy from "lodash/sortBy"
 import * as moment from "moment"
 import { Moment } from "moment"
 
@@ -11,12 +11,10 @@ export class LevelsChart {
   private readonly yLevelMax: number
 
   constructor(apiLevels: LevelProgression[]) {
-    this.levels = _.chain(apiLevels)
-      .sortBy("level")
+    this.levels = sortBy(apiLevels, "level")
       .map(({ level, unlocked_at }) => ({ x: moment(unlocked_at), y: level }))
-      .value()
 
-    this.yLevelMax = Math.max(..._.map(apiLevels, "level"))
+    this.yLevelMax = Math.max(...apiLevels.map(l => l.level))
   }
 
   public getMinX(): Moment {
