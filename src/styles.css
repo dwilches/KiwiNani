@@ -2,6 +2,7 @@
 body {
   background-color: #eee;
   background-image: url("https://cdn.wanikani.com/assets/default-v2/bg-texture-6c0132b3fcddeea4e286d332e0dd1a6c12454a3394e936a18338756456e269bd.png");
+  font-family: 'Montserrat', sans-serif;
 }
 
 h1 {
