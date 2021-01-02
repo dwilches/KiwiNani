@@ -14,7 +14,7 @@
               'btn-secondary': currentTimeSpan != 'LAST_MONTH',
               'btn-primary app-primary-button': currentTimeSpan == 'LAST_MONTH'
             }"
-            [disabled]="loading"
+            [disabled]="loading || currentCriteria == 'LEVEL'"
             (click)="changeTimeSpan('LAST_MONTH')">Last month
     </button>
     <button class="btn"
@@ -22,7 +22,7 @@
               'btn-secondary': currentTimeSpan != 'LAST_3_MONTHS',
               'btn-primary app-primary-button': currentTimeSpan == 'LAST_3_MONTHS'
             }"
-            [disabled]="loading"
+            [disabled]="loading || currentCriteria == 'LEVEL'"
             (click)="changeTimeSpan('LAST_3_MONTHS')">Last 3 months
     </button>
     <button class="btn"

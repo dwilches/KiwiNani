@@ -12,7 +12,7 @@ type ChartCriteria = "LEVEL" | "PASSED_AT" | "BURNED_AT"
 @Component({
   selector: "app-progress-dashboard",
   templateUrl: "./progress-chart.component.html",
-  styleUrls: [ "./progress-chart.component.css" ]
+  styleUrls: [ "./progress-chart.component.scss" ]
 })
 export class ProgressChartComponent implements OnInit, AfterViewInit {
 
@@ -73,6 +73,11 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
   public changeCriteria(criteria: ChartCriteria): void {
     this.currentCriteria = criteria
     this.regenerateChartData()
+
+    if (this.currentCriteria === "LEVEL") {
+      this.changeTimeSpan("ALL")
+    }
+
     this.chart.update()
   }
 
