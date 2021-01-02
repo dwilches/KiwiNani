@@ -51,6 +51,14 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
       })
   }
 
+  public getCriteriaClass(level: string): string {
+    return this.currentCriteria === level ? "btn-primary app-primary-button" : "btn-secondary"
+  }
+
+  public getTimespanClass(timespan: string): string {
+    return this.currentTimeSpan === timespan ? "btn-primary app-primary-button" : "btn-secondary"
+  }
+
   private regenerateChartData(): void {
     if (this.chart) {
       this.chart.destroy()

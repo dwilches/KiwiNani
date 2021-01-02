@@ -8,64 +8,57 @@
       </div>
     </div>
   </div>
-  <div class="d-flex justify-content-center timespan-buttons">
-    <button class="btn"
-            [ngClass]="{
-              'btn-secondary': currentTimeSpan != 'LAST_MONTH',
-              'btn-primary app-primary-button': currentTimeSpan == 'LAST_MONTH'
-            }"
-            [disabled]="loading || currentCriteria == 'LEVEL'"
-            (click)="changeTimeSpan('LAST_MONTH')">Last month
-    </button>
-    <button class="btn"
-            [ngClass]="{
-              'btn-secondary': currentTimeSpan != 'LAST_3_MONTHS',
-              'btn-primary app-primary-button': currentTimeSpan == 'LAST_3_MONTHS'
-            }"
-            [disabled]="loading || currentCriteria == 'LEVEL'"
-            (click)="changeTimeSpan('LAST_3_MONTHS')">Last 3 months
-    </button>
-    <button class="btn"
-            [ngClass]="{
-              'btn-secondary': currentTimeSpan != 'ALL',
-              'btn-primary app-primary-button': currentTimeSpan == 'ALL'
-            }"
-            [disabled]="loading"
-            (click)="changeTimeSpan('ALL')">All
-    </button>
-  </div>
-  <div class="d-flex justify-content-center criteria-buttons">
-    <button class="btn"
-            [ngClass]="{
-              'btn-secondary': currentCriteria != 'LEVEL',
-              'btn-primary app-primary-button': currentCriteria == 'LEVEL'
-            }"
-            [disabled]="loading"
-            (click)="changeCriteria('LEVEL')">Level
-    </button>
-    <button class="btn"
-            [ngClass]="{
-              'btn-secondary': currentCriteria != 'PASSED_AT',
-              'btn-primary app-primary-button': currentCriteria == 'PASSED_AT'
-            }"
-            [disabled]="loading"
-            (click)="changeCriteria('PASSED_AT')">Passed At
-    </button>
-    <button class="btn"
-            [ngClass]="{
-              'btn-secondary': currentCriteria != 'BURNED_AT',
-              'btn-primary app-primary-button': currentCriteria == 'BURNED_AT'
-            }"
-            [disabled]="loading"
-            (click)="changeCriteria('BURNED_AT')">Burned At
-    </button>
-    <button class="btn"
-            [ngClass]="{
-              'btn-secondary': currentCriteria != 'JLPT',
-              'btn-primary app-primary-button': currentCriteria == 'JLPT'
-            }"
-            [disabled]="loading"
-            (click)="changeCriteria('JLPT')">JLPT
-    </button>
+
+  <div style="display: flex; justify-content: center">
+    <div>
+      <div class="criteria-buttons">
+        <div class="button-group-title">Chart Type:</div>
+        <div class="d-flex justify-content-center">
+          <button class="btn"
+                  [class]="getCriteriaClass('LEVEL')"
+                  [disabled]="loading"
+                  (click)="changeCriteria('LEVEL')">Level
+          </button>
+          <button class="btn"
+                  [class]="getCriteriaClass('PASSED_AT')"
+                  [disabled]="loading"
+                  (click)="changeCriteria('PASSED_AT')">Passed At
+          </button>
+          <button class="btn"
+                  [class]="getCriteriaClass('BURNED_AT')"
+                  [disabled]="loading"
+                  (click)="changeCriteria('BURNED_AT')">Burned At
+          </button>
+          <button class="btn"
+                  [class]="getCriteriaClass('JLPT')"
+                  [disabled]="loading"
+                  (click)="changeCriteria('JLPT')">JLPT
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="currentCriteria == 'PASSED_AT' || currentCriteria == 'BURNED_AT'">
+        <div class="timespan-buttons">
+          <div class="button-group-title">Time span:</div>
+          <div class="d-flex justify-content-center">
+            <button class="btn"
+                    [class]="getTimespanClass('LAST_MONTH')"
+                    [disabled]="loading || currentCriteria == 'LEVEL'"
+                    (click)="changeTimeSpan('LAST_MONTH')">Last month
+            </button>
+            <button class="btn"
+                    [class]="getTimespanClass('LAST_3_MONTHS')"
+                    [disabled]="loading || currentCriteria == 'LEVEL'"
+                    (click)="changeTimeSpan('LAST_3_MONTHS')">Last 3 months
+            </button>
+            <button class="btn"
+                    [class]="getTimespanClass('ALL')"
+                    [disabled]="loading"
+                    (click)="changeTimeSpan('ALL')">All
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
