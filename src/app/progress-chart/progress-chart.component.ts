@@ -83,19 +83,21 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
   public changeTimeSpan(timespan: ChartTimeSpan): void {
     let min
 
-    switch (timespan) {
-      case "LAST_MONTH":
-        min = moment().subtract(1, "months").startOf("day")
-        break
-      case "LAST_3_MONTHS":
-        min = moment().subtract(3, "months").startOf("day")
-        break
-      case "ALL":
-        min = this.currentCriteria === "LEVEL"
-          ? this.levelsChart.getMinX()
-          : this.currentCriteria === "JLPT"
-            ? this.jlptChart.getMinX()
-            : this.countsChart.getMinX(this.currentCriteria)
+    if (this.currentCriteria === "LEVEL") {
+      min = this.levelsChart.getMinX()
+    } else if (this.currentCriteria === "JLPT") {
+      min = this.jlptChart.getMinX()
+    } else {
+      switch (timespan) {
+        case "LAST_MONTH":
+          min = moment().subtract(1, "months").startOf("day")
+          break
+        case "LAST_3_MONTHS":
+          min = moment().subtract(3, "months").startOf("day")
+          break
+        case "ALL":
+          min = this.countsChart.getMinX(this.currentCriteria)
+      }
     }
 
     this.currentTimeSpan = timespan
@@ -106,11 +108,6 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
   public changeCriteria(criteria: ChartCriteria): void {
     this.currentCriteria = criteria
     this.regenerateChartData()
-
-    if (this.currentCriteria === "LEVEL") {
-      this.changeTimeSpan("ALL")
-    }
-
     this.chart.update()
   }
 
