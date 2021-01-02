@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core"
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http"
+import {HttpClient, HttpHeaders} from "@angular/common/http"
 import {Observable, ReplaySubject} from "rxjs"
 import {map} from "rxjs/operators"
 
@@ -56,10 +56,10 @@ export class WanikaniService {
   // Invokes the "assignments" endpoint once and again until all data has been retrieved.
   public async getAllAssignments(): Promise<Assignment[]> {
     let nextUrl = `${this.wanikaniServer}/v2/assignments`
-    let allData = []
+    const allData = []
     while (nextUrl) {
       const response = await this.baseGet(nextUrl).toPromise()
-      allData = [...allData, ...(response.data as AssignmentMetadata[])]
+      allData.push(...response.data as AssignmentMetadata[])
       nextUrl = response.pages.next_url
     }
     return allData.map(a => a.data)

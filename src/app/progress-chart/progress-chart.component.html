@@ -59,5 +59,13 @@
             [disabled]="loading"
             (click)="changeCriteria('BURNED_AT')">Burned At
     </button>
+    <button class="btn"
+            [ngClass]="{
+              'btn-secondary': currentCriteria != 'JLPT',
+              'btn-primary app-primary-button': currentCriteria == 'JLPT'
+            }"
+            [disabled]="loading"
+            (click)="changeCriteria('JLPT')">JLPT
+    </button>
   </div>
 </div>

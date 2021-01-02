@@ -1,6 +1,7 @@
 import sortBy from "lodash/sortBy"
 import * as moment from "moment"
 import { Moment } from "moment"
+import { WanikaniService } from "../wanikani.service/wanikani.service"
 
 export type ChartType = "PASSED_AT" | "BURNED_AT"
 type XYData = Array<{ x: Moment, y: number }>
@@ -9,10 +10,13 @@ type Accumulators = Record<string, SingleAccumulator>
 
 export class CountsChart {
 
-  private readonly allAssignments: Assignment[]
+  private allAssignments: Assignment[]
 
-  constructor(allAssignments: Assignment[]) {
-    this.allAssignments = allAssignments
+  constructor() {
+  }
+
+  public async initialize(wanikani: WanikaniService): Promise<void> {
+    this.allAssignments = await wanikani.getAllAssignments()
   }
 
   public getMinX(chartType: ChartType): Moment {
@@ -22,7 +26,47 @@ export class CountsChart {
     return sorted[0].startOf("day")
   }
 
-  public getYAxes(): Array<object> {
+  public getChartConfig(chartType: ChartType): object {
+    return {
+      type: "line",
+      data: {
+        datasets: this.getDatasets(chartType)
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          xAxes: [
+            {
+              type: "time",
+              time: {
+                tooltipFormat: "YYYY-MM-DD h:mm a",
+                displayFormats: {
+                  day: "ddd, MMM DD"
+                },
+                unit: "day"
+              },
+              display: true,
+              gridLines: {
+                drawTicks: true,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: "Date"
+              }
+            }
+          ],
+          yAxes: this.getYAxes()
+        },
+        title: {
+          display: true,
+          text: `WaniKani Progress`
+        },
+      }
+    }
+  }
+
+  private getYAxes(): Array<object> {
     return [
       {
         id: "right",
@@ -44,7 +88,7 @@ export class CountsChart {
    * This dataset has in "x" the date in which an assignment was passed, and in "y" the accumulated number of assignments passed/burned
    * up to that day.
    */
-  public getDataset(chartType: ChartType): Array<object> {
+  private getDatasets(chartType: ChartType): Array<object> {
     const { kanjis, vocabulary, radicals } = this.getAssignments(chartType)
 
     return [

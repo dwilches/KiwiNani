@@ -4,9 +4,10 @@ import { Chart } from "chart.js"
 import * as moment from "moment"
 import { LevelsChart } from "./levels-chart"
 import { CountsChart } from "./counts-chart"
+import { JlptChart } from "./jlpt-chart"
 
 type ChartTimeSpan = "ALL" | "LAST_MONTH" | "LAST_3_MONTHS"
-type ChartCriteria = "LEVEL" | "PASSED_AT" | "BURNED_AT"
+type ChartCriteria = "LEVEL" | "PASSED_AT" | "BURNED_AT" | "JLPT"
 
 
 @Component({
@@ -18,6 +19,7 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
 
   private levelsChart: LevelsChart
   private countsChart: CountsChart
+  private jlptChart: JlptChart
 
   private chart: Chart
   currentTimeSpan: ChartTimeSpan = "LAST_MONTH"
@@ -33,14 +35,20 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    Promise.all([ this.wanikani.getLevelProgressions(), this.wanikani.getAllAssignments() ])
-      .then(([ allLevels, allAssignments ]) => {
-        this.levelsChart = new LevelsChart(allLevels)
-        this.countsChart = new CountsChart(allAssignments)
+    this.levelsChart = new LevelsChart()
+    this.countsChart = new CountsChart()
+    this.jlptChart = new JlptChart()
+
+    Promise
+      .all([
+        this.levelsChart.initialize(this.wanikani),
+        this.countsChart.initialize(this.wanikani),
+        this.jlptChart.initialize(this.wanikani)
+      ])
+      .then(() => {
         this.regenerateChartData()
+        this.loading = false
       })
-      .catch(console.error)
-      .finally(() => this.loading = false)
   }
 
   private regenerateChartData(): void {
@@ -62,7 +70,11 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
         min = moment().subtract(3, "months").startOf("day")
         break
       case "ALL":
-        min = this.currentCriteria === "LEVEL" ? this.levelsChart.getMinX() : this.countsChart.getMinX(this.currentCriteria)
+        min = this.currentCriteria === "LEVEL"
+          ? this.levelsChart.getMinX()
+          : this.currentCriteria === "JLPT"
+            ? this.jlptChart.getMinX()
+            : this.countsChart.getMinX(this.currentCriteria)
     }
 
     this.currentTimeSpan = timespan
@@ -82,53 +94,16 @@ export class ProgressChartComponent implements OnInit, AfterViewInit {
   }
 
   private createChart(): Chart {
-    let datasets, yAxes
+    let config
     if (this.currentCriteria === "LEVEL") {
-      datasets = this.levelsChart.getDataset()
-      yAxes = this.levelsChart.getYAxes()
+      config = this.levelsChart.getChartConfig()
+    } else if (this.currentCriteria === "JLPT") {
+      config = this.jlptChart.getChartConfig()
     } else {
-      datasets = this.countsChart.getDataset(this.currentCriteria)
-      yAxes = this.countsChart.getYAxes()
+      config = this.countsChart.getChartConfig(this.currentCriteria)
     }
 
     const ctx = (document.getElementById("dashboardChart") as any).getContext("2d")
-    const config = {
-      type: "line",
-      data: {
-        datasets
-      },
-      options: {
-        maintainAspectRatio: false,
-        responsive: true,
-        scales: {
-          xAxes: [
-            {
-              type: "time",
-              time: {
-                tooltipFormat: "YYYY-MM-DD h:mm a",
-                displayFormats: {
-                  day: "ddd, MMM DD"
-                },
-                unit: "day"
-              },
-              display: true,
-              gridLines: {
-                drawTicks: true,
-              },
-              scaleLabel: {
-                display: true,
-                labelString: "Date"
-              }
-            }
-          ],
-          yAxes
-        },
-        title: {
-          display: true,
-          text: `WaniKani Progress`
-        },
-      }
-    }
     return new Chart(ctx, config)
   }
 }
