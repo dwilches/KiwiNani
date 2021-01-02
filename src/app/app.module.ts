@@ -7,6 +7,7 @@ import { HttpClientModule } from "@angular/common/http"
 import { AppRoutingModule } from "./app-routing.module"
 import { FormsModule } from "@angular/forms"
 import { NavbarComponent } from "./navbar/navbar.component"
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { NavbarComponent } from "./navbar/navbar.component"
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule

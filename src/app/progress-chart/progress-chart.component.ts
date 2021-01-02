@@ -5,6 +5,7 @@ import * as moment from "moment"
 import { LevelsChart } from "./levels-chart"
 import { CountsChart } from "./counts-chart"
 import { JlptChart } from "./jlpt-chart"
+import { animate, style, transition, trigger } from "@angular/animations"
 
 type ChartTimeSpan = "ALL" | "LAST_MONTH" | "LAST_3_MONTHS"
 type ChartCriteria = "LEVEL" | "PASSED_AT" | "BURNED_AT" | "JLPT"
@@ -13,7 +14,19 @@ type ChartCriteria = "LEVEL" | "PASSED_AT" | "BURNED_AT" | "JLPT"
 @Component({
   selector: "app-progress-dashboard",
   templateUrl: "./progress-chart.component.html",
-  styleUrls: [ "./progress-chart.component.scss" ]
+  styleUrls: [ "./progress-chart.component.scss" ],
+  animations: [
+    trigger("fadeInOutTrigger", [
+      transition(":enter", [
+        style({ opacity: 0 }),
+        animate(".5s ease", style({ opacity: 1 }))
+      ]),
+      transition(":leave", [
+        style({ opacity: 1 }),
+        animate(".5s ease", style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class ProgressChartComponent implements OnInit, AfterViewInit {
 

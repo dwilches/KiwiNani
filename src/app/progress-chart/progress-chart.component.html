@@ -37,7 +37,8 @@
         </div>
       </div>
 
-      <div *ngIf="currentCriteria == 'PASSED_AT' || currentCriteria == 'BURNED_AT'">
+      <div @fadeInOutTrigger
+           *ngIf="currentCriteria == 'PASSED_AT' || currentCriteria == 'BURNED_AT'">
         <div class="timespan-buttons">
           <div class="button-group-title">Time span:</div>
           <div class="d-flex justify-content-center">
