@@ -20,11 +20,6 @@ const routes: Routes = [
     pathMatch: "full"
   },
   {
-    path: "game",
-    loadChildren: () => import("./game/game.module").then(m => m.GameModule),
-    pathMatch: "full"
-  },
-  {
     path: "**",
     redirectTo: "main"
   }
